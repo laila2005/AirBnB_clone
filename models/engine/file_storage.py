@@ -1,5 +1,6 @@
 # models/engine/file_storage.py
 import os
+import models
 import json
 from models.base_model import BaseModel
 from models.user import User
@@ -33,13 +34,9 @@ class FileStorage:
 
     def reload(self):
         """Deserializes the JSON file to __objects if it exists"""
-        if os.path.exists(type(self).__file_path) is True:
-            return
-            try:
-                with open(type(self).__file_path, "r") as file:
-                    new_obj = json.load(file)
-                    for key, val in new_obj.items():
-                        obj = self.class_dict[val['__class__']](**val)
-                        type(self).__objects[key] = obj
-            except FileNotFoundError:
-                pass
+        if os.path.exists(FileStorage.__file_path):
+            with open(FileStorage.__file_path, "r") as file:
+                new_obj = json.load(file)
+                for key, val in new_obj.items():
+                    obj = models.class_dict[val['__class__']](**val)
+                    FileStorage.__objects[key] = obj

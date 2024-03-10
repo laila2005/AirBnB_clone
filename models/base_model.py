@@ -2,7 +2,7 @@
 """Defines all common attributes/methods for other classes."""
 import uuid
 from datetime import datetime
-import models
+import models  # Updated import
 
 
 class BaseModel:
@@ -20,7 +20,7 @@ class BaseModel:
         else:
             self.id = str(uuid.uuid4())
             self.created_at = self.updated_at = datetime.now()
-            models.storage.new(self)
+            models.storage.new(self)  # Add the new instance to the storage
 
     def __str__(self):
         """Return the print/str representation of the BaseModel."""
@@ -30,7 +30,7 @@ class BaseModel:
     def save(self):
         """Save the object to the file storage."""
         self.updated_at = datetime.now()
-        models.storage.save()
+        models.storage.save()  # Updated line
 
     def to_dict(self):
         """Return the dictionary representation of the BaseModel."""
