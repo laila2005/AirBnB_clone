@@ -2,7 +2,8 @@
 """Defines all common attributes/methods for other classes."""
 import uuid
 from datetime import datetime
-import models  # Updated import
+import models
+
 
 class BaseModel:
     """Defines all common attributes/methods for other classes."""

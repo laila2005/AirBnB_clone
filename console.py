@@ -74,7 +74,8 @@ class ConsoleCommand(cmd.Cmd):
             print("** class doesn't exist **")
         else:
             for obj in models.storage.all().values():
-                if len(args) > 0 and args[0] == obj.__class__.__name__ or len(args) == 0:
+                if (len(args) > 0 and args[0] == obj.__class__.__name__) \
+                        or len(args) == 0:
                     print(obj)
 
     def do_update(self, arg):
@@ -149,4 +150,4 @@ class ConsoleCommand(cmd.Cmd):
 
 
 if __name__ == '__main__':
-    ConsoleCommand().cmdloop()
+    HBNBCommand().cmdloop()
