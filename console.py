@@ -1,4 +1,3 @@
-# console.py
 import cmd
 import models
 from models.base_model import BaseModel
@@ -9,20 +8,29 @@ from models.amenity import Amenity
 from models.place import Place
 from models.review import Review
 
+class_dict = {
+    "BaseModel": BaseModel,
+    "User": User,
+    "State": State,
+    "City": City,
+    "Amenity": Amenity,
+    "Place": Place,
+    "Review": Review
+}
 
-class HBNBCommand(cmd.Cmd):
-    """ HBNBCommand class. """
+
+class ConsoleCommand(cmd.Cmd):
+    """ ConsoleCommand class. """
     prompt = '(hbnb) '
 
     def do_create(self, arg):
         """ Creates a new instance of BaseModel or User """
         if not arg:
             print("** class name missing **")
-        elif arg not in ["BaseModel", "User", "State",
-                         "City", "Amenity", "Place", "Review"]:
+        elif arg not in class_dict.keys():
             print("** class doesn't exist **")
         else:
-            new_instance = globals()arg
+            new_instance = class_dictarg
             new_instance.save()
             print(new_instance.id)
 
@@ -31,8 +39,7 @@ class HBNBCommand(cmd.Cmd):
         args = arg.split()
         if len(args) == 0:
             print("** class name missing **")
-        elif args[0] not in ["BaseModel", "User", "State",
-                             "City", "Amenity", "Place", "Review"]:
+        elif args[0] not in class_dict.keys():
             print("** class doesn't exist **")
         elif len(args) == 1:
             print("** instance id missing **")
@@ -48,8 +55,7 @@ class HBNBCommand(cmd.Cmd):
         args = arg.split()
         if len(args) == 0:
             print("** class name missing **")
-        elif args[0] not in ["BaseModel", "User", "State",
-                             "City", "Amenity", "Place", "Review"]:
+        elif args[0] not in class_dict.keys():
             print("** class doesn't exist **")
         elif len(args) == 1:
             print("** instance id missing **")
@@ -64,14 +70,11 @@ class HBNBCommand(cmd.Cmd):
     def do_all(self, arg):
         """Prints all string representation """
         args = arg.split()
-        if len(args) > 0 and args[0] not in ["BaseModel", "User", "State",
-                                             "City", "Amenity",
-                                             "Place", "Review"]:
+        if len(args) > 0 and args[0] not in class_dict.keys():
             print("** class doesn't exist **")
         else:
             for obj in models.storage.all().values():
-                if len(args) > 0 and args[0] == obj.__class__.__name__ or
-                len(args) == 0:
+                if len(args) > 0 and args[0] == obj.__class__.__name__ or len(args) == 0:
                     print(obj)
 
     def do_update(self, arg):
@@ -79,8 +82,7 @@ class HBNBCommand(cmd.Cmd):
         args = arg.split()
         if len(args) == 0:
             print("** class name missing **")
-        elif args[0] not in ["BaseModel", "User",
-                             "State", "City", "Amenity", "Place", "Review"]:
+        elif args[0] not in class_dict.keys():
             print("** class doesn't exist **")
         elif len(args) == 1:
             print("** instance id missing **")
@@ -147,4 +149,4 @@ class HBNBCommand(cmd.Cmd):
 
 
 if __name__ == '__main__':
-    HBNBCommand().cmdloop()
+    ConsoleCommand().cmdloop()
