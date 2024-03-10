@@ -1,10 +1,8 @@
 #!/usr/bin/python3
 """Defines all common attributes/methods for other classes."""
-
 import uuid
 from datetime import datetime
-from models import storage
-
+import models  # Updated import
 
 class BaseModel:
     """Defines all common attributes/methods for other classes."""
@@ -21,7 +19,7 @@ class BaseModel:
         else:
             self.id = str(uuid.uuid4())
             self.created_at = self.updated_at = datetime.now()
-            storage.new(self)  # Add the new instance to the storage
+            models.storage.new(self)  # Updated line
 
     def __str__(self):
         """Return the print/str representation of the BaseModel."""
@@ -31,7 +29,7 @@ class BaseModel:
     def save(self):
         """Save the object to the file storage."""
         self.updated_at = datetime.now()
-        storage.save()  # Save the current state of the storage
+        models.storage.save()  # Updated line
 
     def to_dict(self):
         """Return the dictionary representation of the BaseModel."""
