@@ -20,7 +20,7 @@ class BaseModel:
         else:
             self.id = str(uuid.uuid4())
             self.created_at = self.updated_at = datetime.now()
-            models.storage.new(self)  # Updated line
+            models.storage.new(self)
 
     def __str__(self):
         """Return the print/str representation of the BaseModel."""
@@ -30,7 +30,7 @@ class BaseModel:
     def save(self):
         """Save the object to the file storage."""
         self.updated_at = datetime.now()
-        models.storage.save()  # Updated line
+        models.storage.save()
 
     def to_dict(self):
         """Return the dictionary representation of the BaseModel."""
