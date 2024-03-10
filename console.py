@@ -91,6 +91,46 @@ class HBNBCommand(cmd.Cmd):
                 setattr(storage.all()[key], args[2], args[3])
                 storage.save()
 
+    def default(self, line):
+        """Method called on an input line when the
+           command prefix is not recognized."""
+        if '.' in line:
+            args = line.split('.')
+            class_name = args[0]
+            command = args[1]
+            if command == "all()":
+                self.do_all(class_name)
+            elif command == "count()":
+                self.do_count(class_name)
+            elif command.startswith("show"):
+                id = command.split('"')[1]
+                self.do_show(class_name + " " + id)
+            elif command.startswith("destroy"):
+                id = command.split('"')[1]
+                self.do_destroy(class_name + " " + id)
+            elif command.startswith("update"):
+                id, attr_dict = command.split('"')[1],
+                command.split('{')[1][:-1]
+                if ':' in attr_dict:
+                    attr_dict = json.loads('{' + attr_dict + '}')
+                    for key, value in attr_dict.items():
+                        self.do_update(class_name + " " + id +
+                                       " " + key + " " + str(value))
+                else:
+                    attr_name, attr_value = attr_dict.split(", ")
+                    self.do_update(class_name + " " + id + " " +
+                                   attr_name + " " + attr_value)
+
+    def do_count(self, arg):
+        """Retrieves the number of instances of a class."""
+        args = arg.split()
+        if len(args) > 0 and args[0] in class_dict:
+            count = 0
+            for key in storage.all():
+                if key.split('.')[0] == args[0]:
+                    count += 1
+            print(count)
+
     def do_quit(self, arg):
         """Quit command to exit the program"""
         return True
