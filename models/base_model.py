@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Defines all common """
+"""Defines all common attributes/methods for other classes."""
 
 import uuid
 from datetime import datetime
@@ -21,6 +21,7 @@ class BaseModel:
         else:
             self.id = str(uuid.uuid4())
             self.created_at = self.updated_at = datetime.now()
+            storage.new(self)  # Add the new instance to the storage
 
     def __str__(self):
         """Return the print/str representation of the BaseModel."""
@@ -28,8 +29,9 @@ class BaseModel:
                                      self.id, self.__dict__)
 
     def save(self):
-        """Update the updated_at attribute to the current datetime."""
+        """Save the object to the file storage."""
         self.updated_at = datetime.now()
+        storage.save()  # Save the current state of the storage
 
     def to_dict(self):
         """Return the dictionary representation of the BaseModel."""
@@ -38,15 +40,3 @@ class BaseModel:
         dictionary['created_at'] = self.created_at.isoformat()
         dictionary['updated_at'] = self.updated_at.isoformat()
         return dictionary
-
-    def save(self):
-        """Save the object to the file storage."""
-        self.updated_at = datetime.now()
-        storage.new(self)
-        storage.save()
-
-    def __init__(self, *args, **kwargs):
-        """Initialize the BaseModel."""
-        # ...
-        if not kwargs:
-            storage.new(self)
