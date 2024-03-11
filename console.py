@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+"""console"""
 import cmd
 from models import storage, class_dict
 from models.base_model import BaseModel
