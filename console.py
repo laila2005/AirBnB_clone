@@ -126,14 +126,17 @@ class HBNBCommand(cmd.Cmd):
                     elif command == "destroy":
                         self.do_destroy(class_name + " " + id)
                     elif command == "update":
-                        id, attr_dict = command.split('"')[1], command.split('{')[1][:-1]
+                        id, attr_dict = command.split('"')[1],
+                        command.split('{')[1][:-1]
                         if ':' in attr_dict:
                             attr_dict = json.loads('{' + attr_dict + '}')
                             for key, value in attr_dict.items():
-                                self.do_update(class_name + " " + id + " " + key + " " + str(value))
+                                self.do_update(class_name + " " + id + " " +
+                                               key + " " + str(value))
                         else:
                             attr_name, attr_value = attr_dict.split(", ")
-                            self.do_update(class_name + " " + id + " " + attr_name + " " + attr_value)
+                            self.do_update(class_name + " " + id + " " +
+                                           attr_name + " " + attr_value)
                     elif command == "all":
                         self.do_all(class_name)
                     elif command == "count":
