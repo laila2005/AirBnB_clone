@@ -71,10 +71,67 @@ class HBNBCommand(cmd.Cmd):
                 if len(args) == 0 or obj.__class__.__name__ == args[0]:
                     print(obj)
 
+    def default(self, line):
+        """Method called on an input line when the
+        command prefix is not recognized."""
+        if '.' in line:
+            args = line.split('.')
+            class_name = args[0]
+            command = args[1].split('(')[0]
+            if class_name not in class_dict:
+                print("** class doesn't exist **")
+            elif command not in ["show", "destroy", "update", "all", "count"]:
+                print("** command doesn't exist **")
+            else:
+                try:
+                    id = args[1].split('(')[1].split(')')[0]
+                    if id == "":
+                        print("** instance id missing **")
+                    else:
+                        if command == "show":
+                            self.do_show(class_name + " " + id)
+                        elif command == "destroy":
+                            self.do_destroy(class_name + " " + id)
+                        elif command == "update":
+                            id, attr_dict = command.split('"')[1],
+                            command.split('{')[1][:-1]
+                            if ':' in attr_dict:
+                                attr_dict = json.loads('{' + attr_dict + '}')
+                                for key, value in attr_dict.items():
+                                    self.do_update(class_name + " " + id + " " +
+                                                key + " " + str(value))
+                            else:
+                                attr_name, attr_value = attr_dict.split(", ")
+                                self.do_update(class_name + " " + id + " " +
+                                            attr_name + " " + attr_value)
+                        elif command == "all":
+                            self.do_all(class_name)
+                        elif command == "count":
+                            self.do_count(class_name)
+                except IndexError:
+                    print("** no instance found **")
+        else:
+            print("*** Unknown syntax: " + line)
+
+
+    def do_count(self, arg):
+        """Counts the number of instances of a class."""
+        args = arg.split()
+        if len(args) == 0:
+            print("** class name missing **")
+        elif args[0] not in class_dict:
+            print("** class doesn't exist **")
+        else:
+            count = 0
+            for key in storage.all():
+                if key.split('.')[0] == args[0]:
+                    count += 1
+            print(count)
+
     def do_update(self, arg):
         """Updates an instance based on the class
-           name and id by adding or updating attribute
-           (save the change into the JSON file)."""
+        name and id by adding or updating attribute
+        (save the change into the JSON file)."""
         args = arg.split()
         if len(args) == 0:
             print("** class name missing **")
@@ -91,59 +148,15 @@ class HBNBCommand(cmd.Cmd):
             elif len(args) == 3:
                 print("** value missing **")
             else:
-                setattr(storage.all()[key], args[2], args[3])
-                storage.save()
-
-    def do_count(self, arg):
-        """Counts the number of instances of a class."""
-        args = arg.split()
-        if len(args) == 0:
-            print("** class name missing **")
-        elif args[0] not in class_dict:
-            print("** class doesn't exist **")
-        else:
-            count = 0
-            for key in storage.all():
-                if key.split('.')[0] == args[0]:
-                    count += 1
-            print(count)
-
-    def default(self, line):
-        """Method called on an input line when the
-           command prefix is not recognized."""
-        if '.' in line:
-            args = line.split('.')
-            class_name = args[0]
-            command = args[1].split('(')[0]
-            if class_name not in class_dict:
-                print("** class doesn't exist **")
-            elif command not in ["show", "destroy", "update", "all", "count"]:
-                print("** command doesn't exist **")
-            else:
                 try:
-                    id = args[1].split('(')[1].split(')')[0]
-                    if command == "show":
-                        self.do_show(class_name + " " + id)
-                    elif command == "destroy":
-                        self.do_destroy(class_name + " " + id)
-                    elif command == "update":
-                        id, attr_dict = command.split('"')[1],
-                        command.split('{')[1][:-1]
-                        if ':' in attr_dict:
-                            attr_dict = json.loads('{' + attr_dict + '}')
-                            for key, value in attr_dict.items():
-                                self.do_update(class_name + " " + id + " " +
-                                               key + " " + str(value))
-                        else:
-                            attr_name, attr_value = attr_dict.split(", ")
-                            self.do_update(class_name + " " + id + " " +
-                                           attr_name + " " + attr_value)
-                    elif command == "all":
-                        self.do_all(class_name)
-                    elif command == "count":
-                        self.do_count(class_name)
-                except IndexError:
-                    print("** no instance found **")
+                    if '.' in args[3]:
+                        value = float(args[3])
+                    else:
+                        value = int(args[3])
+                except ValueError:
+                    value = args[3]
+                setattr(storage.all()[key], args[2], value)
+                storage.save()
 
     def do_quit(self, arg):
         """Quit command to exit the program"""

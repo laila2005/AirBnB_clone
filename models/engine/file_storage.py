@@ -1,4 +1,4 @@
-# models/engine/file_storage.py
+# file_storage.py
 """file_storage"""
 import os
 import models
@@ -29,15 +29,19 @@ class FileStorage:
 
     def save(self):
         """Serializes __objects to the JSON file (path: __file_path)."""
-        with open(FileStorage.__file_path, 'w') as f:
-            json.dump({k: v.to_dict() for k, v in
-                      FileStorage.__objects.items()}, f)
+        new_dict = []
+        for obj in self.__objects.values():
+            new_dict.append(obj.to_dict())
+        with open(self.__file_path, "w", encoding='utf-8') as file:
+            json.dump(new_dict, file)
 
     def reload(self):
         """Deserializes the JSON file to __objects if it exists"""
         if os.path.exists(FileStorage.__file_path):
             with open(FileStorage.__file_path, "r") as file:
                 new_obj = json.load(file)
-                for key, val in new_obj.items():
+                for val in new_obj:
                     obj = models.class_dict[val['__class__']](**val)
+                    key = obj.__class__.__name__ + "." + obj.id
                     FileStorage.__objects[key] = obj
+
