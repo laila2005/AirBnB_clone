@@ -1,19 +1,20 @@
 #!/usr/bin/python3
-"""console"""
+"""Console module."""
+
 import cmd
+import json
 from models import storage, class_dict
 from models.base_model import BaseModel
 import models
-import json
 
 
 class HBNBCommand(cmd.Cmd):
-    """HBNBCommand class"""
+    """HBNBCommand class."""
     prompt = '(hbnb)  '
 
     def do_create(self, arg):
         """Creates a new instance of BaseModel,
-           saves it (to the JSON file) and prints the id."""
+        saves it (to the JSON file), and prints the id."""
         args = arg.split()
         if len(args) == 0:
             print("** class name missing **")
@@ -25,8 +26,8 @@ class HBNBCommand(cmd.Cmd):
             print(new_instance.id)
 
     def do_show(self, arg):
-        """Prints the string representation of
-           an instance based on the class name and id."""
+        """Prints the string representation of an instance
+        based on the class name and id."""
         args = arg.split()
         if len(args) == 0:
             print("** class name missing **")
@@ -35,16 +36,15 @@ class HBNBCommand(cmd.Cmd):
         elif len(args) == 1:
             print("** instance id missing **")
         else:
-            key = args[0] + "." + args[1]
+            key = f"{args[0]}.{args[1]}"
             if key not in storage.all():
                 print("** no instance found **")
             else:
                 print(storage.all()[key])
 
     def do_destroy(self, arg):
-        """Deletes an instance based on the
-           class name and id (save the change
-           into the JSON file)."""
+        """Deletes an instance based on the class name and id
+        (save the change into the JSON file)."""
         args = arg.split()
         if len(args) == 0:
             print("** class name missing **")
@@ -53,7 +53,7 @@ class HBNBCommand(cmd.Cmd):
         elif len(args) == 1:
             print("** instance id missing **")
         else:
-            key = args[0] + "." + args[1]
+            key = f"{args[0]}.{args[1]}"
             if key not in storage.all():
                 print("** no instance found **")
             else:
@@ -61,8 +61,8 @@ class HBNBCommand(cmd.Cmd):
                 storage.save()
 
     def do_all(self, arg):
-        """Prints all string representation of all
-           instances based or not on the class name."""
+        """Prints all string representation of all instances
+        based or not on the class name."""
         args = arg.split()
         if len(args) > 0 and args[0] not in class_dict:
             print("** class doesn't exist **")
@@ -72,8 +72,8 @@ class HBNBCommand(cmd.Cmd):
                     print(obj)
 
     def default(self, line):
-        """Method called on an input line when the
-        command prefix is not recognized."""
+        """Called on an input line when
+        the command prefix is not recognized."""
         if '.' in line:
             args = line.split('.')
             class_name = args[0]
@@ -93,17 +93,17 @@ class HBNBCommand(cmd.Cmd):
                         elif command == "destroy":
                             self.do_destroy(class_name + " " + id)
                         elif command == "update":
-                            id, attr_dict = command.split('"')[1],
-                            command.split('{')[1][:-1]
+                            id, attr_dict = command.split('"')[1], \
+                                            command.split('{')[1][:-1]
                             if ':' in attr_dict:
                                 attr_dict = json.loads('{' + attr_dict + '}')
                                 for key, value in attr_dict.items():
-                                    self.do_update(class_name + " " + id + " " +
-                                                key + " " + str(value))
+                                    self.do_update(f"{class_name} {id} {key} "
+                                                   f"{str(value)}")
                             else:
                                 attr_name, attr_value = attr_dict.split(", ")
-                                self.do_update(class_name + " " + id + " " +
-                                            attr_name + " " + attr_value)
+                                self.do_update(f"{class_name} {id} {attr_name}"
+                                               f"{attr_value}")
                         elif command == "all":
                             self.do_all(class_name)
                         elif command == "count":
@@ -112,7 +112,6 @@ class HBNBCommand(cmd.Cmd):
                     print("** no instance found **")
         else:
             print("*** Unknown syntax: " + line)
-
 
     def do_count(self, arg):
         """Counts the number of instances of a class."""
@@ -129,9 +128,8 @@ class HBNBCommand(cmd.Cmd):
             print(count)
 
     def do_update(self, arg):
-        """Updates an instance based on the class
-        name and id by adding or updating attribute
-        (save the change into the JSON file)."""
+        """Updates an instance based on the class name and id by adding
+        or updating attribute (save the change into the JSON file)."""
         args = arg.split()
         if len(args) == 0:
             print("** class name missing **")
@@ -140,7 +138,7 @@ class HBNBCommand(cmd.Cmd):
         elif len(args) == 1:
             print("** instance id missing **")
         else:
-            key = args[0] + "." + args[1]
+            key = f"{args[0]}.{args[1]}"
             if key not in storage.all():
                 print("** no instance found **")
             elif len(args) == 2:
@@ -149,29 +147,26 @@ class HBNBCommand(cmd.Cmd):
                 print("** value missing **")
             else:
                 try:
-                    if '.' in args[3]:
-                        value = float(args[3])
-                    else:
-                        value = int(args[3])
+                    value = float(args[3]) if '.' in args[3] else int(args[3])
                 except ValueError:
                     value = args[3]
                 setattr(storage.all()[key], args[2], value)
                 storage.save()
 
     def do_quit(self, arg):
-        """Quit command to exit the program"""
+        """Quit command to exit the program."""
         return True
 
     def do_EOF(self, arg):
-        """EOF command to exit the program"""
+        """EOF command to exit the program."""
         return True
 
     def emptyline(self):
-        """An empty line + ENTER shouldn’t execute anything"""
+        """An empty line + ENTER shouldn't execute anything."""
         pass
 
     def do_help(self, arg):
-        """Help command"""
+        """Help command."""
         super().do_help(arg)
 
 
