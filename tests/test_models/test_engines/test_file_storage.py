@@ -26,39 +26,40 @@ class FileStorageTests(unittest.TestCase):
 
         key = bm_dict['__class__'] + "." + bm_dict['id']
         self.assertIn(key, all_objs)
-
+        
     def testStoreBaseModel2(self):
-        """Test save, reload, and update functions"""
-        self.my_model.my_name = "First name"
-        self.my_model.save()
-        bm_dict = self.my_model.to_dict()
-        all_objs = storage.all()
+    """Test save, reload, and update functions"""
+    self.my_model.my_name = "First name"
+    self.my_model.save()
+    bm_dict = self.my_model.to_dict()
+    all_objs = storage.all()
 
-        key = bm_dict['__class__'] + "." + bm_dict['id']
-        self.assertIn(key, all_objs)
-        self.assertEqual(bm_dict['my_name'], "First name")
+    key = bm_dict['__class__'] + "." + bm_dict['id']
+    self.assertIn(key, all_objs)
+    self.assertEqual(bm_dict['my_name'], "First name")
 
-        create1 = bm_dict['created_at']
-        update1 = bm_dict['updated_at']
+    create1 = bm_dict['created_at']
+    update1 = bm_dict['updated_at']
 
-        self.my_model.my_name = "Second name"
-        self.my_model.save()
-        bm_dict = self.my_model.to_dict()
-        all_objs = storage.all()
+    self.my_model.my_name = "Second name"
+    self.my_model.save()
+    bm_dict = self.my_model.to_dict()
+    all_objs = storage.all()
 
-        self.assertIn(key, all_objs)
-        self.assertEqual(bm_dict['my_name'], "Second name")
+    self.assertIn(key, all_objs)
+    self.assertEqual(bm_dict['my_name'], "Second name")
 
-        create2 = bm_dict['created_at']
-        update2 = bm_dict['updated_at']
+    create2 = bm_dict['created_at']
+    update2 = bm_dict['updated_at']
 
-        self.assertEqual(create1, create2)
-        self.assertNotEqual(update1, update2)
+    self.assertEqual(create1, create2)
+    self.assertNotEqual(update1, update2)
 
-        storage.reload()
-        reloaded_objs = storage.all()
-        self.assertIn(key, reloaded_objs)
-        self.assertEqual(reloaded_objs[key].to_dict()['my_name'], "Second name")
+    # Reload storage and verify changes persist
+    storage.reload()
+    reloaded_objs = storage.all()
+    self.assertIn(key, reloaded_objs)
+    self.assertEqual(reloaded_objs[key].to_dict()['my_name'], "Second name")
 
     def testHasAttributes(self):
         """Verify if attributes exist"""
