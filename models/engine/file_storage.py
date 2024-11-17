@@ -44,4 +44,3 @@ class FileStorage:
                     obj = models.class_dict[val['__class__']](**val)
                     key = obj.__class__.__name__ + "." + obj.id
                     FileStorage.__objects[key] = obj
-
