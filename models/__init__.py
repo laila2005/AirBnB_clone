@@ -9,7 +9,7 @@ from .city import City
 from .amenity import Amenity
 from .place import Place
 from .review import Review
-from .engine.file_storage import FileStorage
+from models.engine.file_storage import FileStorage
 
 class_dict = {
     "BaseModel": BaseModel,

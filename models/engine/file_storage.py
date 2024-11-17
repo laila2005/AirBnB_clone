@@ -29,18 +29,25 @@ class FileStorage:
 
     def save(self):
         """Serializes __objects to the JSON file (path: __file_path)."""
-        new_dict = []
-        for obj in self.__objects.values():
-            new_dict.append(obj.to_dict())
+        obj_dict = {key: obj.to_dict() for key,
+                    obj in FileStorage.__objects.items()}
         with open(self.__file_path, "w", encoding='utf-8') as file:
-            json.dump(new_dict, file)
+            json.dump(obj_dict, file)
 
     def reload(self):
-        """Deserializes the JSON file to __objects if it exists"""
-        if os.path.exists(FileStorage.__file_path):
-            with open(FileStorage.__file_path, "r") as file:
-                new_obj = json.load(file)
-                for val in new_obj:
-                    obj = models.class_dict[val['__class__']](**val)
-                    key = obj.__class__.__name__ + "." + obj.id
-                    FileStorage.__objects[key] = obj
+        """Deserializes the JSON file to __objects if it exists."""
+        if os.path.exists(self.__file_path):
+            with open(self.__file_path, "r", encoding='utf-8') as file:
+                obj_data = json.load(file)
+                # Handle legacy list format
+                if isinstance(obj_data, list):
+                    for val in obj_data:
+                        class_name = val['__class__']
+                        obj = globals()[class_name](**val)
+                        key = obj.__class__.__name__ + "." + obj.id
+                        FileStorage.__objects[key] = obj
+                elif isinstance(obj_data, dict):
+                    for key, val in obj_data.items():
+                        class_name = val['__class__']
+                        obj = globals()[class_name](**val)
+                        FileStorage.__objects[key] = obj
