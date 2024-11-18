@@ -141,28 +141,35 @@ class HBNBCommand(cmd.Cmd):
                 print(f"*** Unknown syntax: {line}")
                 return
 
-            if command.startswith("update"):
-                args = command[len("update("):-1]  # Strip `update(` and `)`
-                args = args.split(", ", maxsplit=2)
+            if command.startswith("update("):
+                try:
+                    args = command[len("update("):-1].split(", ", maxsplit=2)
+                    if len(args) < 3:
+                        print("** value missing **")
+                        return
 
-                if len(args) < 3:
-                    print("** value missing **")
-                    return
+                    instance_id = args[0].strip('"')
+                    attribute_name = args[1].strip('"')
+                    value = args[2].strip('"')
 
-                instance_id = args[0].strip('"')
-                attribute_name = args[1].strip('"')
-                value = args[2].strip('"')
+                    # Convert value appropriately
+                    if value.isdigit():
+                        value = int(value)
+                    elif value.replace('.', '', 1).isdigit() and value.count('.') == 1:
+                        value = float(value)
+                    else:
+                        value = value.strip('"')
 
-                key = f"{class_name}.{instance_id}"
-                obj = storage.all().get(key)
-                if not obj:
-                    print("** no instance found **")
-                    return
+                    key = f"{class_name}.{instance_id}"
+                    obj = storage.all().get(key)
+                    if not obj:
+                        print("** no instance found **")
+                        return
 
-                # Update the attribute and save
-                setattr(obj, attribute_name,
-                        eval(value) if value.isnumeric() else value)
-                obj.save()
+                    setattr(obj, attribute_name, value)
+                    obj.save()
+                except Exception:
+                    print("** Invalid arguments **")
                 return
 
             elif command.startswith("show("):
@@ -188,7 +195,7 @@ class HBNBCommand(cmd.Cmd):
                 return
 
             print(f"*** Unknown syntax: {line}")
-        except Exception as e:
+        except ValueError:
             print(f"*** Unknown syntax: {line}")
 
 
