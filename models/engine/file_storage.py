@@ -26,10 +26,12 @@ class FileStorage:
     def save(self):
         """Serializes __objects to the JSON file."""
         if not isinstance(self, FileStorage):
-            raise TypeError("save() must be called on an instance of FileStorage")
+            raise TypeError(
+                "save() must be called on an instance of FileStorage")
         try:
             with open(self.__file_path, "w") as f:
-                obj_dict = {key: obj.to_dict() for key, obj in self.__objects.items()}
+                obj_dict = {key: obj.to_dict() for key,
+                            obj in self.__objects.items()}
                 json.dump(obj_dict, f)
         except Exception as e:
             print(f"Error saving to file: {e}")
@@ -68,4 +70,3 @@ class FileStorage:
                             self.__objects[key] = classes[class_name](**value)
             except Exception as e:
                 print(f"Error during reload: {e}")
-

@@ -136,43 +136,28 @@ class HBNBCommand(cmd.Cmd):
     def default(self, line):
         """Handle commands in <ClassName>.command() format."""
         try:
+            # Split the input into class name and command
             class_name, command = line.split(".", 1)
             if class_name not in self.classes:
                 print(f"*** Unknown syntax: {line}")
                 return
 
-            if command.startswith("update("):
-                try:
-                    args = command[len("update("):-1].split(", ", maxsplit=2)
-                    if len(args) < 3:
-                        print("** value missing **")
-                        return
-
-                    instance_id = args[0].strip('"')
-                    attribute_name = args[1].strip('"')
-                    value = args[2].strip('"')
-
-                    # Convert value appropriately
-                    if value.isdigit():
-                        value = int(value)
-                    elif value.replace('.', '', 1).isdigit() and value.count('.') == 1:
-                        value = float(value)
-                    else:
-                        value = value.strip('"')
-
-                    key = f"{class_name}.{instance_id}"
-                    obj = storage.all().get(key)
-                    if not obj:
-                        print("** no instance found **")
-                        return
-
-                    setattr(obj, attribute_name, value)
-                    obj.save()
-                except Exception:
-                    print("** Invalid arguments **")
+            # Handle `all()`
+            if command.strip() == "all()":
+                objs = [str(obj) for obj in storage.all().values()
+                        if obj.__class__.__name__ == class_name]
+                print(objs)
                 return
 
-            elif command.startswith("show("):
+            # Handle `count()`
+            if command.strip() == "count()":
+                count = sum(1 for obj in storage.all().values()
+                            if obj.__class__.__name__ == class_name)
+                print(count)
+                return
+
+            # Handle `show(instance_id)`
+            if command.startswith("show("):
                 instance_id = command[len("show("):-1].strip('"')
                 key = f"{class_name}.{instance_id}"
                 obj = storage.all().get(key)
@@ -182,16 +167,44 @@ class HBNBCommand(cmd.Cmd):
                     print("** no instance found **")
                 return
 
-            elif command.startswith("count()"):
-                count = sum(1 for obj in storage.all().values()
-                            if obj.__class__.__name__ == class_name)
-                print(count)
-                return
+            # Handle `destroy(instance_id)`
+            if command.startswith("destroy("):
+                instance_id = command[len("destroy("):-1].strip('"')
+                key = f"{class_name}.{instance_id}"
+                if key in storage.all():
+                    del storage.all()[key]
+                    storage.save()
+                    return
+                else:
+                    print("** no instance found **")
+                    return
 
-            elif command.startswith("all()"):
-                objs = [str(obj) for obj in storage.all().values()
-                        if obj.__class__.__name__ == class_name]
-                print(objs)
+            # Handle `update(instance_id, attr_name, attr_value)`
+            if command.startswith("update("):
+                args = command[len("update("):-1].split(", ", maxsplit=2)
+                if len(args) < 3:
+                    print("** value missing **")
+                    return
+
+                instance_id = args[0].strip('"')
+                attr_name = args[1].strip('"')
+                attr_value = args[2].strip('"')
+
+                key = f"{class_name}.{instance_id}"
+                obj = storage.all().get(key)
+                if not obj:
+                    print("** no instance found **")
+                    return
+
+                # Convert attr_value to the correct type
+                if attr_value.isdigit():
+                    attr_value = int(attr_value)
+                elif (attr_value.replace('.', '', 1).isdigit()
+                      and '.' in attr_value):
+                    attr_value = float(attr_value)
+
+                setattr(obj, attr_name, attr_value)
+                obj.save()
                 return
 
             print(f"*** Unknown syntax: {line}")
